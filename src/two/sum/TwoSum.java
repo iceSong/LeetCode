@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * 给定一个整数数组，返回两个数字的索引，使得它们相加到一个特定的目标。
  *
- * @author song@liu@ele.me
+ * @author song.liu@ele.me
  * @version v1.0，2017-02-07 17:01
  */
 public class TwoSum {
