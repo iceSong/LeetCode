@@ -1,8 +1,8 @@
-package two.sum;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 给定一个整数数组，返回两个数字的索引，使得它们相加到一个特定的目标。
@@ -13,8 +13,7 @@ import java.util.Map;
 public class TwoSum {
 
     public static void main(String[] args) {
-        SolutionA solutionA = new TwoSum().new SolutionA();
-        int[] answer = solutionA.twoSum(new int[]{1, 2, 4, 3, 6, 9, 7, 4, 8, 12, 32}, 5);
+        int[] answer = twoSumA(new int[]{1, 2, 4, 3, 6, 9, 7, 4, 8, 12, 32}, 5);
         for (int i = 0; i < answer.length; i++) {
             System.out.println(answer[i]);
         }
@@ -23,43 +22,42 @@ public class TwoSum {
     /**
      * 1. 先对数组进行过排序
      * 2. 从排序后数组两端开始，定义两个游标向中间移动，大于目标值减小右边的游标，小于目标则增加左边的游标
-     *
+     * <p>
      * Time Complexity: O(n)
      * Space Complexity: O(n)
      */
-    class SolutionA {
-        public int[] twoSum(int[] nums, int target) {
-            int[] copy = new int[nums.length];
-            for (int j = 0; j < nums.length; j++) {
-                copy[j] = nums[j];
-            }
-            Arrays.sort(copy);  // 从小到大排序
-            int[] answer = new int[2];
-
-            int l = 0, r = copy.length - 1;
-            while (l < r && l >= 0 && r < copy.length) {
-                int temp = copy[l] + copy[r];
-                if (temp > target) {
-                    r--;
-                } else if (temp < target) {
-                    l++;
-                } else {
-                    break;
-                }
-            }
-
-            boolean rr = true, ll = true;
-            for (int k = 0; k < nums.length; k++) {
-                if (nums[k] == copy[l] && ll) {
-                    answer[0] = k;
-                    ll = false;
-                } else if (nums[k] == copy[r] && rr) {
-                    answer[1] = k;
-                    rr = false;
-                }
-            }
-            return answer;
+    public static int[] twoSumA(int[] nums, int target) {
+        int[] copy = new int[nums.length];
+        for (int j = 0; j < nums.length; j++) {
+            copy[j] = nums[j];
         }
+        // 从小到大排序
+        Arrays.sort(copy);
+        int[] answer = new int[2];
+
+        int l = 0, r = copy.length - 1;
+        while (l < r && l >= 0 && r < copy.length) {
+            int temp = copy[l] + copy[r];
+            if (temp > target) {
+                r--;
+            } else if (temp < target) {
+                l++;
+            } else {
+                break;
+            }
+        }
+
+        boolean rr = true, ll = true;
+        for (int k = 0; k < nums.length; k++) {
+            if (nums[k] == copy[l] && ll) {
+                answer[0] = k;
+                ll = false;
+            } else if (nums[k] == copy[r] && rr) {
+                answer[1] = k;
+                rr = false;
+            }
+        }
+        return answer;
     }
 
     /**
@@ -81,20 +79,18 @@ public class TwoSum {
      * Space complexity : O(n)O(n). The extra space required depends on the number of items stored in the hash table, wh
      * -ich stores exactly nn elements.
      */
-    class SolutionB {
-        public int[] twoSum(int[] nums, int target) {
-            Map<Integer, Integer> map = new HashMap<>();
-            for (int i = 0; i < nums.length; i++) {
-                map.put(nums[i], i);
-            }
-            for (int i = 0; i < nums.length; i++) {
-                int complement = target - nums[i];
-                if (map.containsKey(complement) && map.get(complement) != i) {
-                    return new int[]{i, map.get(complement)};
-                }
-            }
-            throw new IllegalArgumentException("No two sum solution");
+    public static int[] twoSumB(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            map.put(nums[i], i);
         }
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement) && map.get(complement) != i) {
+                return new int[]{i, map.get(complement)};
+            }
+        }
+        throw new IllegalArgumentException("No two sum solution");
     }
 
 
@@ -108,17 +104,15 @@ public class TwoSum {
      * Space complexity : O(n)O(n). The extra space required depends on the number of items stored in the hash table, wh
      * -ich stores at most nn elements.
      */
-    class SolutionC {
-        public int[] twoSum(int[] nums, int target) {
-            Map<Integer, Integer> map = new HashMap<>();
-            for (int i = 0; i < nums.length; i++) {
-                int complement = target - nums[i];
-                if (map.containsKey(complement)) {
-                    return new int[]{map.get(complement), i};
-                }
-                map.put(nums[i], i);
+    public static int[] twoSumC(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[]{map.get(complement), i};
             }
-            throw new IllegalArgumentException("No two sum solution");
+            map.put(nums[i], i);
         }
+        throw new IllegalArgumentException("No two sum solution");
     }
 }
