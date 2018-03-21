@@ -17,7 +17,7 @@ public class OneAddTo1000 {
         threadPool();
         future();
         parallel();
-        System.exit(0);
+        forkJoin();
     }
 
     /**
@@ -65,6 +65,7 @@ public class OneAddTo1000 {
         }
         countDownLatch.await();
         System.out.println(sum.get() + " " + (System.currentTimeMillis() - start));
+        pool.shutdown();
     }
 
 
@@ -89,6 +90,7 @@ public class OneAddTo1000 {
         for (Future<Integer> f : futures) {
             sum += f.get();
         }
+        pool.shutdown();
         System.out.println(sum + " " + (System.currentTimeMillis() - start));
     }
 
@@ -98,4 +100,45 @@ public class OneAddTo1000 {
         System.out.println(sum + " " + (System.currentTimeMillis() - start));
     }
 
+    public static void forkJoin() throws ExecutionException, InterruptedException {
+
+        ForkJoinPool pool = new ForkJoinPool();
+        CountTask task = new CountTask(1, 10000);
+        Future<Integer> future = pool.submit(task);
+
+        long start = System.currentTimeMillis();
+        int a = future.get();
+        System.out.println("ForkJoin " + a + " " + (System.currentTimeMillis() - start));
+        pool.shutdown();
+    }
+
+    static class CountTask extends RecursiveTask<Integer> {
+        private static final int THRESHOLD = 10;
+        int start;
+        int end;
+
+        public CountTask(int start, int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        protected Integer compute() {
+            int sum = 0;
+            int canCompute = end - start;
+            if (canCompute <= THRESHOLD) {
+                for (int i = start; i <= end; i++) {
+                    sum += i;
+                }
+            } else {
+                int tmp = (start + end) / 2;
+                CountTask left = new CountTask(start, tmp);
+                CountTask right = new CountTask(tmp + 1, end);
+                left.fork();
+                right.fork();
+                sum = left.join() + right.join();
+            }
+            return sum;
+        }
+    }
 }
